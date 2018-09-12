@@ -3,7 +3,7 @@ import { is } from 'ramda'
 import fetch from 'node-fetch'
 
 import { IPFS } from '../../../src/StorageWriter/IPFS'
-import { offendingClaim, workingClaim } from './claims'
+import { offendingClaim, workingClaim } from './claimData'
 
 const isString = is(String)
 
