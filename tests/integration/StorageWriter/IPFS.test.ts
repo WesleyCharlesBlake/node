@@ -3,7 +3,7 @@ import { is } from 'ramda'
 import fetch from 'node-fetch'
 
 import { IPFS } from '../../../src/StorageWriter/IPFS'
-import { offendingClaim, workingClaim } from './claimData'
+import { offendingClaim, workingClaim, offendingClaimWithInvlaidUtf8CharsRemoved } from './claimData'
 
 const isString = is(String)
 
@@ -22,7 +22,7 @@ const fetchFile = async (hash: string): Promise<string> => {
   return response.text()
 }
 
-describe('IPFS.addText', async (should: any) => {
+describe('IPFS.addText', async should => {
   const { assert } = should('')
 
   {
@@ -47,6 +47,28 @@ describe('IPFS.addText', async (should: any) => {
 
   {
     const ipfs = createIPFS()
+    const claim = offendingClaimWithInvlaidUtf8CharsRemoved
+    const hash = await ipfs.addText(JSON.stringify(claim))
+    assert({
+      given: 'a offending claim with invalid utf8 characters stripped',
+      should: 'return a hash',
+      actual: isString(hash),
+      expected: true
+    })
+
+    console.log('sdfdsfsdf', hash)
+
+    const file = await fetchFile(hash)
+    assert({
+      given: 'the offending claim with invalid utf8 characters stripped hash',
+      should: 'read the same claim from ipfs',
+      actual: JSON.parse(file),
+      expected: claim
+    })
+  }
+  
+  {
+    const ipfs = createIPFS()
     const claim = offendingClaim
     const hash = await ipfs.addText(JSON.stringify(claim))
     assert({
@@ -65,3 +87,4 @@ describe('IPFS.addText', async (should: any) => {
     })
   }
 })
+
