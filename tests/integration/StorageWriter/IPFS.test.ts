@@ -3,7 +3,7 @@ import { is } from 'ramda'
 import fetch from 'node-fetch'
 
 import { IPFS } from '../../../src/StorageWriter/IPFS'
-import { offendingClaim, workingClaim, offendingClaimWithInvlaidUtf8CharsRemoved, encodeContent, decodeContent } from './claimData'
+import { normalClaim, invalidUtf8CharactersClaim, encodeContent, decodeContent, cleanContent } from './claimData'
 
 const isString = is(String)
 
@@ -22,110 +22,107 @@ const fetchFile = async (hash: string): Promise<string> => {
   return response.text()
 }
 
-function invalidChars(input: string) {
-  let output = ""
-  for (var i=0; i<input.length; i++) {
-      if (input.charCodeAt(i) <= 127) {
-          // output += input.charAt(i);
-      } else {
-        output += input.charAt(i);
-      }
-  }
-  return output;
-}
-
 describe('IPFS.addText', async should => {
   const { assert } = should('')
 
   {
     const ipfs = createIPFS()
-    const claim = workingClaim
-    const hash = await ipfs.addText(JSON.stringify(claim))
+    const claim = normalClaim
+    let hash, claimFromIPFS
+    
+    try {
+      hash = await ipfs.addText(JSON.stringify(claim))
+      claimFromIPFS = JSON.parse(await fetchFile(hash))
+    } catch(e) { console.error(e) }
+
     assert({
-      given: 'a working claim',
+      given: 'a normal claim',
       should: 'return a hash',
       actual: isString(hash),
       expected: true
     })
 
-    const file = await fetchFile(hash)
     assert({
-      given: 'the working claims hash',
+      given: 'the normal claim\'s hash',
       should: 'read the same claim from ipfs',
-      actual: JSON.parse(file),
+      actual: claimFromIPFS,
       expected: claim
     })
   }
 
   {
     const ipfs = createIPFS()
-    const claim = offendingClaimWithInvlaidUtf8CharsRemoved
-    const hash = await ipfs.addText(JSON.stringify(claim))
+    const claim = cleanContent(invalidUtf8CharactersClaim)
+    let hash, claimFromIPFS
+    
+    try {
+      hash = await ipfs.addText(JSON.stringify(claim))
+      claimFromIPFS = JSON.parse(await fetchFile(hash))
+    } catch(e) { console.error(e) }
+
     assert({
-      given: 'a offending claim with invalid utf8 characters stripped',
+      given: 'a invalid utf8 characters are stripped',
       should: 'return a hash',
       actual: isString(hash),
       expected: true
     })
 
-    const file = await fetchFile(hash)
     assert({
-      given: 'the offending claim with invalid utf8 characters stripped hash',
+      given: 'the claim with invalid utf8 characters stripped hash',
       should: 'read the same claim from ipfs',
-      actual: JSON.parse(file),
+      actual: claimFromIPFS,
       expected: claim
     })
   }
 
   {
-    // wrap in try just for now to not prevent next test from running
+    const ipfs = createIPFS()
+    const claim = encodeContent(invalidUtf8CharactersClaim)
+    let hash, claimFromIPFS
+  
     try {
-      const ipfs = createIPFS()
-      const claim = encodeContent(offendingClaim)
-      const hash = await ipfs.addText(JSON.stringify(claim))
+      hash = await ipfs.addText(JSON.stringify(claim))
+      claimFromIPFS = JSON.parse(await fetchFile(hash))
+    } catch(e) { console.error(e) }
 
-      assert({
-        given: 'a offending claim content utf8 encoded',
-        should: 'return a hash',
-        actual: isString(hash),
-        expected: true
-      })
+    assert({
+      given: 'a claim with invalid utf8 characters, utf8 encoded',
+      should: 'return a hash',
+      actual: isString(hash),
+      expected: true
+    })
 
-      const file = await fetchFile(hash)
-      assert({
-        given: 'the offending claim content utf8 encoded hash',
-        should: 'read the same claim from ipfs',
-        actual: decodeContent(JSON.parse(file)),
-        expected: claim
-      })
-    } catch (e) {
-      console.error(e)
-    }
+    assert({
+      given: 'the offending claim content utf8 encoded hash',
+      should: 'read the same claim from ipfs',
+      actual: decodeContent(claimFromIPFS),
+      expected: claim
+    })
   }
   
   {
-    // wrap in try just for now to not prevent next test from running
-    try {
-      const ipfs = createIPFS()
-      const claim = offendingClaim
-      const hash = await ipfs.addText(JSON.stringify(claim))
-      assert({
-        given: 'a offending claim',
-        should: 'return a hash',
-        actual: isString(hash),
-        expected: true
-      })
+    const ipfs = createIPFS()
+    const claim = invalidUtf8CharactersClaim
+    let hash, claimFromIPFS
 
-      const file = await fetchFile(hash)
-      assert({
-        given: 'the offending claims hash',
-        should: 'read the same claim from ipfs',
-        actual: JSON.parse(file),
-        expected: claim
-      })
-    } catch(e) {
-      console.error(e)
-    }
+    try {
+      hash = await ipfs.addText(JSON.stringify(claim))
+      claimFromIPFS = JSON.parse(await fetchFile(hash))
+    } catch(e) { console.error(e) }
+  
+    assert({
+      given: 'a claim with invalid utf8 characters',
+      should: 'return a hash',
+      actual: isString(hash),
+      expected: true
+    })
+
+    assert({
+      given: 'the a claim with invalid utf8 character\'s hash',
+      should: 'read the same claim from ipfs',
+      actual: claimFromIPFS,
+      expected: claim
+    })
   }
 })
 
