@@ -1,3 +1,8 @@
+import { lensPath, pipe, over } from 'ramda'
+import { encode, decode } from 'utf8'
+
+const content = lensPath(['attributes', 'content']) 
+
 function cleanString(input: string) {
   let output = ""
   for (var i=0; i<input.length; i++) {
@@ -40,9 +45,7 @@ export const offendingClaim = {
 	}
 }
 
-export const offendingClaimWithInvlaidUtf8CharsRemoved = {
-	...offendingClaim,
-	attributes: {
-		content: cleanString(offendingClaim.attributes.content)
-	}
-}
+export const offendingClaimWithInvlaidUtf8CharsRemoved = over(content, cleanString, offendingClaim)
+
+export const encodeContent = over(content, encode)
+export const decodeContent = over(content, decode)
