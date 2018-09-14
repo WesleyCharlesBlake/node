@@ -2,7 +2,7 @@ import { describe } from 'riteway'
 import fetch from 'node-fetch'
 
 import { IPFS } from '../../../src/StorageWriter/IPFS'
-import { normalClaim, invalidUtf8CharactersClaim, encodeContent, decodeContent, cleanContent } from './claimData'
+import { allAsciiCharactersClaim, nonAsciiCharactersClaim } from './claimData'
 
 const IPFS_URL = process.env.IPFS_URL || 'http://localhost:5001'
 
@@ -24,7 +24,7 @@ describe('IPFS.addText', async should => {
 
   {
     const ipfs = createIPFS()
-    const claim = normalClaim
+    const claim = allAsciiCharactersClaim
     let claimFromIPFS
     
     try {
@@ -32,41 +32,7 @@ describe('IPFS.addText', async should => {
       claimFromIPFS = JSON.parse(await fetchFile(hash))
     } finally {
       assert({
-        given: 'a normal claim',
-        actual: claimFromIPFS,
-        expected: claim
-      })
-    }
-  }
-
-  {
-    const ipfs = createIPFS()
-    const claim = cleanContent(invalidUtf8CharactersClaim)
-    let claimFromIPFS
-    
-    try {
-      const hash = await ipfs.addText(JSON.stringify(claim))
-      claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } finally {
-      assert({
-        given: 'a claim that had its invalid characters stripped',
-        actual: claimFromIPFS,
-        expected: claim
-      })
-    }
-  }
-
-  {
-    const ipfs = createIPFS()
-    const claim = invalidUtf8CharactersClaim
-    let claimFromIPFS
-  
-    try {
-      const hash = await ipfs.addText(JSON.stringify(encodeContent(claim)))
-      claimFromIPFS = decodeContent(JSON.parse(await fetchFile(hash)))
-    } finally {
-      assert({
-        given: 'a claim that had its invalid characters encoded',
+        given: 'a claim that only contains ascii characters',
         actual: claimFromIPFS,
         expected: claim
       })
@@ -75,7 +41,7 @@ describe('IPFS.addText', async should => {
   
   {
     const ipfs = createIPFS()
-    const claim = invalidUtf8CharactersClaim
+    const claim = nonAsciiCharactersClaim
     let claimFromIPFS
 
     try {
@@ -83,7 +49,7 @@ describe('IPFS.addText', async should => {
       claimFromIPFS = JSON.parse(await fetchFile(hash))
     } finally {
       assert({
-        given: 'a claim with invalid characters',
+        given: 'a claim that contains non-ascii characters',
         actual: claimFromIPFS,
         expected: claim
       })
