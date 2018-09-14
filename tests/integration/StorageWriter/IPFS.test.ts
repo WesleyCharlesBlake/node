@@ -25,13 +25,12 @@ describe('IPFS.addText', async should => {
   {
     const ipfs = createIPFS()
     const claim = normalClaim
-    let hash, claimFromIPFS
+    let claimFromIPFS
     
     try {
-      hash = await ipfs.addText(JSON.stringify(claim))
+      const hash = await ipfs.addText(JSON.stringify(claim))
       claimFromIPFS = JSON.parse(await fetchFile(hash))
     } finally {
-
       assert({
         given: 'a normal claim',
         actual: claimFromIPFS,
@@ -43,13 +42,12 @@ describe('IPFS.addText', async should => {
   {
     const ipfs = createIPFS()
     const claim = cleanContent(invalidUtf8CharactersClaim)
-    let hash, claimFromIPFS
+    let claimFromIPFS
     
     try {
-      hash = await ipfs.addText(JSON.stringify(claim))
+      const hash = await ipfs.addText(JSON.stringify(claim))
       claimFromIPFS = JSON.parse(await fetchFile(hash))
     } finally {
-
       assert({
         given: 'a claim that had its invalid characters stripped',
         actual: claimFromIPFS,
@@ -61,13 +59,12 @@ describe('IPFS.addText', async should => {
   {
     const ipfs = createIPFS()
     const claim = invalidUtf8CharactersClaim
-    let hash, claimFromIPFS
+    let claimFromIPFS
   
     try {
-      hash = await ipfs.addText(JSON.stringify(encodeContent(claim)))
+      const hash = await ipfs.addText(JSON.stringify(encodeContent(claim)))
       claimFromIPFS = decodeContent(JSON.parse(await fetchFile(hash)))
     } finally {
-
       assert({
         given: 'a claim that had its invalid characters encoded',
         actual: claimFromIPFS,
@@ -79,15 +76,14 @@ describe('IPFS.addText', async should => {
   {
     const ipfs = createIPFS()
     const claim = invalidUtf8CharactersClaim
-    let hash, claimFromIPFS
+    let claimFromIPFS
 
     try {
-      hash = await ipfs.addText(JSON.stringify(claim))
+      const hash = await ipfs.addText(JSON.stringify(claim))
       claimFromIPFS = JSON.parse(await fetchFile(hash))
     } finally {
-
       assert({
-        given: 'the a claim with invalid characters',
+        given: 'a claim with invalid characters',
         actual: claimFromIPFS,
         expected: claim
       })

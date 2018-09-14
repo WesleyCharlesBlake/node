@@ -6,7 +6,6 @@ import { IPFSConfiguration } from './IPFSConfiguration'
 /**
  * Wrapper around IPFS' RPC
  */
-
 @injectable()
 export class IPFS {
   private readonly url: string
