@@ -58,6 +58,7 @@
     "protobufjs": "6.8.8",
     "ramda": "0.25.0",
     "reflect-metadata": "0.1.12",
+    "request": "2.88.0",
     "string-to-stream": "1.1.1",
     "utf8": "^3.0.0"
   },
@@ -73,6 +74,7 @@
     "@types/mongodb": "3.1.7",
     "@types/node-fetch": "1.6.9",
     "@types/pino": "4.16.1",
+    "@types/request": "2.47.1",
     "@types/sinon": "5.0.2",
     "@types/utf8": "^2.1.6",
     "alsatian": "2.3.0",

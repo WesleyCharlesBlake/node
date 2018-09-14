@@ -1,0 +1,12 @@
+{
+	"id":"4304c9239ef1fa6b86872f21c040b2c3c13361c610d12fcd3007b0b663d7ce7b",
+	"publicKey":"024cd0fe4c33231ca7c1d76f6fe00689f5872bcd4bc5557ab4cd2c5691b49c25a3",
+	"signature":"304402200b06264c113d46200c0b7cd10d244832ba0dd1b798460ce846fd4477070be21f02206bdcb4bba8d568a98567bd59b8cb874086b51407d1f39e6b898dca248d863d09",
+	"type":"Work",
+	"created":"2018-09-13T23:23:44.750Z",
+	"attributes": {
+		"name":"Test",
+		"author":"Test",
+		"content":"these chars: öüäüüüüäüüüüßßä'üüßüääöüäööäääääßüüüßüüäüöüößüüöüüäöääüäööüüüüääüüüäöüäääöüü are causing me problems"
+	}
+}
