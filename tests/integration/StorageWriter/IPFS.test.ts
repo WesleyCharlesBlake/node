@@ -4,7 +4,7 @@ import fetch from 'node-fetch'
 import { IPFS } from '../../../src/StorageWriter/IPFS'
 import { normalClaim, invalidUtf8CharactersClaim, encodeContent, decodeContent, cleanContent } from './claimData'
 
-const IPFS_URL = 'http://localhost:5001'
+const IPFS_URL = process.env.IPFS_URL || 'http://localhost:5001'
 
 const createIPFS = ({
   ipfsUrl = IPFS_URL
