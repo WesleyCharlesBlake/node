@@ -30,13 +30,14 @@ describe('IPFS.addText', async should => {
     try {
       hash = await ipfs.addText(JSON.stringify(claim))
       claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } catch(e) {}
+    } finally {
 
-    assert({
-      given: 'a normal claim',
-      actual: claimFromIPFS,
-      expected: claim
-    })
+      assert({
+        given: 'a normal claim',
+        actual: claimFromIPFS,
+        expected: claim
+      })
+    }
   }
 
   {
@@ -47,13 +48,14 @@ describe('IPFS.addText', async should => {
     try {
       hash = await ipfs.addText(JSON.stringify(claim))
       claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } catch(e) {}
+    } finally {
 
-    assert({
-      given: 'a claim that had its invalid characters stripped',
-      actual: claimFromIPFS,
-      expected: claim
-    })
+      assert({
+        given: 'a claim that had its invalid characters stripped',
+        actual: claimFromIPFS,
+        expected: claim
+      })
+    }
   }
 
   {
@@ -64,13 +66,14 @@ describe('IPFS.addText', async should => {
     try {
       hash = await ipfs.addText(JSON.stringify(encodeContent(claim)))
       claimFromIPFS = decodeContent(JSON.parse(await fetchFile(hash)))
-    } catch(e) {}
+    } finally {
 
-    assert({
-      given: 'a claim that had its invalid characters encoded',
-      actual: claimFromIPFS,
-      expected: claim
-    })
+      assert({
+        given: 'a claim that had its invalid characters encoded',
+        actual: claimFromIPFS,
+        expected: claim
+      })
+    }
   }
   
   {
@@ -81,13 +84,14 @@ describe('IPFS.addText', async should => {
     try {
       hash = await ipfs.addText(JSON.stringify(claim))
       claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } catch(e) {}
+    } finally {
 
-    assert({
-      given: 'the a claim with invalid characters',
-      actual: claimFromIPFS,
-      expected: claim
-    })
+      assert({
+        given: 'the a claim with invalid characters',
+        actual: claimFromIPFS,
+        expected: claim
+      })
+    }
   }
 })
 
