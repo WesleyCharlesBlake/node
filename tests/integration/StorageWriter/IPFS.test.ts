@@ -23,7 +23,7 @@ const fetchFile = async (hash: string): Promise<string> => {
 }
 
 describe('IPFS.addText', async should => {
-  const { assert } = should('')
+  const { assert } = should('match the claim read from ipfs')
 
   {
     const ipfs = createIPFS()
@@ -37,14 +37,6 @@ describe('IPFS.addText', async should => {
 
     assert({
       given: 'a normal claim',
-      should: 'return a hash',
-      actual: isString(hash),
-      expected: true
-    })
-
-    assert({
-      given: 'the normal claim\'s hash',
-      should: 'read the same claim from ipfs',
       actual: claimFromIPFS,
       expected: claim
     })
@@ -61,15 +53,7 @@ describe('IPFS.addText', async should => {
     } catch(e) { console.error(e) }
 
     assert({
-      given: 'a invalid utf8 characters are stripped',
-      should: 'return a hash',
-      actual: isString(hash),
-      expected: true
-    })
-
-    assert({
-      given: 'the claim with invalid utf8 characters stripped hash',
-      should: 'read the same claim from ipfs',
+      given: 'a claim that had its invalid characters stripped',
       actual: claimFromIPFS,
       expected: claim
     })
@@ -86,15 +70,7 @@ describe('IPFS.addText', async should => {
     } catch(e) { console.error(e) }
 
     assert({
-      given: 'a claim with invalid utf8 characters, utf8 encoded',
-      should: 'return a hash',
-      actual: isString(hash),
-      expected: true
-    })
-
-    assert({
-      given: 'the offending claim content utf8 encoded hash',
-      should: 'read the same claim from ipfs',
+      given: 'a claim that had its invalid characters encoded',
       actual: decodeContent(claimFromIPFS),
       expected: claim
     })
@@ -109,17 +85,9 @@ describe('IPFS.addText', async should => {
       hash = await ipfs.addText(JSON.stringify(claim))
       claimFromIPFS = JSON.parse(await fetchFile(hash))
     } catch(e) { console.error(e) }
-  
-    assert({
-      given: 'a claim with invalid utf8 characters',
-      should: 'return a hash',
-      actual: isString(hash),
-      expected: true
-    })
 
     assert({
-      given: 'the a claim with invalid utf8 character\'s hash',
-      should: 'read the same claim from ipfs',
+      given: 'the a claim with invalid characters',
       actual: claimFromIPFS,
       expected: claim
     })
