@@ -1,11 +1,8 @@
 import { describe } from 'riteway'
-import { is } from 'ramda'
 import fetch from 'node-fetch'
 
 import { IPFS } from '../../../src/StorageWriter/IPFS'
 import { normalClaim, invalidUtf8CharactersClaim, encodeContent, decodeContent, cleanContent } from './claimData'
-
-const isString = is(String)
 
 const IPFS_URL = 'http://localhost:5001'
 

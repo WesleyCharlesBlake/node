@@ -1,16 +1,16 @@
 import { lensPath, over } from 'ramda'
 import { encode, decode } from 'utf8'
 
-const content = lensPath(['attributes', 'content']) 
+const content = lensPath(['attributes', 'content'])
 
 function cleanString(input: string) {
-  let output = ""
+  let output = ''
   for (var i=0; i<input.length; i++) {
       if (input.charCodeAt(i) <= 127) {
-          output += input.charAt(i);
+          output += input.charAt(i)
       }
   }
-  return output;
+  return output
 }
 
 export const cleanContent = over(content, cleanString)
