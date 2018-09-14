@@ -30,7 +30,7 @@ describe('IPFS.addText', async should => {
     try {
       hash = await ipfs.addText(JSON.stringify(claim))
       claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } catch(e) { console.error(e) }
+    } catch(e) {}
 
     assert({
       given: 'a normal claim',
@@ -47,7 +47,7 @@ describe('IPFS.addText', async should => {
     try {
       hash = await ipfs.addText(JSON.stringify(claim))
       claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } catch(e) { console.error(e) }
+    } catch(e) {}
 
     assert({
       given: 'a claim that had its invalid characters stripped',
@@ -58,17 +58,17 @@ describe('IPFS.addText', async should => {
 
   {
     const ipfs = createIPFS()
-    const claim = encodeContent(invalidUtf8CharactersClaim)
+    const claim = invalidUtf8CharactersClaim
     let hash, claimFromIPFS
   
     try {
-      hash = await ipfs.addText(JSON.stringify(claim))
-      claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } catch(e) { console.error(e) }
+      hash = await ipfs.addText(JSON.stringify(encodeContent(claim)))
+      claimFromIPFS = decodeContent(JSON.parse(await fetchFile(hash)))
+    } catch(e) {}
 
     assert({
       given: 'a claim that had its invalid characters encoded',
-      actual: decodeContent(claimFromIPFS),
+      actual: claimFromIPFS,
       expected: claim
     })
   }
@@ -81,7 +81,7 @@ describe('IPFS.addText', async should => {
     try {
       hash = await ipfs.addText(JSON.stringify(claim))
       claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } catch(e) { console.error(e) }
+    } catch(e) {}
 
     assert({
       given: 'the a claim with invalid characters',
