@@ -8,13 +8,6 @@ import { IPFSConfiguration } from './IPFSConfiguration'
 /**
  * Wrapper around IPFS' RPC
  */
-
-const createStream = (text: string) => {
-  const stream = str(text)
-  stream.path = 'claim.json'
-  return stream
-}
-
 @injectable()
 export class IPFS {
   private readonly url: string
@@ -26,7 +19,8 @@ export class IPFS {
   addText = async (text: string): Promise<string> => {
     const formData = new FormData() // { maxDataSize: 20971520 }
 
-    formData.append('file', createStream(text), {
+    formData.append('file', str(text), {
+      knownLength: Buffer.from(text).length,
       filename: 'file',
       contentType: 'plain/text',
     })
