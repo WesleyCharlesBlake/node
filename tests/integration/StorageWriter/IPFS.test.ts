@@ -2,7 +2,7 @@ import { describe } from 'riteway'
 import fetch from 'node-fetch'
 
 import { IPFS } from '../../../src/StorageWriter/IPFS'
-import { allAsciiCharactersClaim, nonAsciiCharactersClaim } from './claimData'
+import { allAsciiCharactersClaim, nonAsciiCharactersClaim, longWithNonAsciiCharactersClaim } from './claimData'
 
 const IPFS_URL = process.env.IPFS_URL || 'http://localhost:5001'
 
@@ -50,6 +50,23 @@ describe('IPFS.addText', async should => {
     } finally {
       assert({
         given: 'a claim that contains non-ascii characters',
+        actual: claimFromIPFS,
+        expected: claim
+      })
+    }
+  }
+
+  {
+    const ipfs = createIPFS()
+    const claim = longWithNonAsciiCharactersClaim
+    let claimFromIPFS
+
+    try {
+      const hash = await ipfs.addText(JSON.stringify(claim))
+      claimFromIPFS = JSON.parse(await fetchFile(hash))
+    } finally {
+      assert({
+        given: 'a longer claim that contains non-ascii characters',
         actual: claimFromIPFS,
         expected: claim
       })
