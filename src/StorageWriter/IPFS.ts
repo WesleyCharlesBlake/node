@@ -11,7 +11,7 @@ import { IPFSConfiguration } from './IPFSConfiguration'
 
 const createStream = (text: string) => {
   const stream = str(text)
-  stream.path = 'claim'
+  stream.path = 'claim.json'
   return stream
 }
 
