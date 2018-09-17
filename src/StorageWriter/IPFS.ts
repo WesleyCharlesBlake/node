@@ -26,7 +26,10 @@ export class IPFS {
   addText = async (text: string): Promise<string> => {
     const formData = new FormData() // { maxDataSize: 20971520 }
 
-    formData.append('file', createStream(text))
+    formData.append('file', createStream(text), {
+      filename: 'file',
+      contentType: 'plain/text',
+    })
 
     const response = await fetch(`${this.url}/api/v0/add`, {
       method: 'post',
