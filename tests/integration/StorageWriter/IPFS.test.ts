@@ -24,53 +24,41 @@ describe('IPFS.addText', async should => {
 
   {
     const ipfs = createIPFS()
-    const claim = allAsciiCharactersClaim
-    let claimFromIPFS
-    
-    try {
-      const hash = await ipfs.addText(JSON.stringify(claim))
-      claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } finally {
-      assert({
-        given: 'a claim that only contains ascii characters',
-        actual: claimFromIPFS,
-        expected: claim
-      })
-    }
+    const claim = allAsciiCharactersClaim 
+    const hash = await ipfs.addText(JSON.stringify(claim))
+    const claimFromIPFS = JSON.parse(await fetchFile(hash))
+
+    assert({
+      given: 'a claim that only contains ascii characters',
+      actual: claimFromIPFS,
+      expected: claim
+    })
   }
   
   {
     const ipfs = createIPFS()
     const claim = nonAsciiCharactersClaim
-    let claimFromIPFS
+    const hash = await ipfs.addText(JSON.stringify(claim))
+    const claimFromIPFS = JSON.parse(await fetchFile(hash))
 
-    try {
-      const hash = await ipfs.addText(JSON.stringify(claim))
-      claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } finally {
-      assert({
-        given: 'a claim that contains non-ascii characters',
-        actual: claimFromIPFS,
-        expected: claim
-      })
-    }
+    assert({
+      given: 'a claim that contains non-ascii characters',
+      actual: claimFromIPFS,
+      expected: claim
+    })
   }
 
   {
     const ipfs = createIPFS()
     const claim = longWithNonAsciiCharactersClaim
-    let claimFromIPFS
+    const hash = await ipfs.addText(JSON.stringify(claim))
+    const claimFromIPFS = JSON.parse(await fetchFile(hash))
 
-    try {
-      const hash = await ipfs.addText(JSON.stringify(claim))
-      claimFromIPFS = JSON.parse(await fetchFile(hash))
-    } finally {
-      assert({
-        given: 'a longer claim that contains non-ascii characters',
-        actual: claimFromIPFS,
-        expected: claim
-      })
-    }
+    assert({
+      given: 'a longer claim that contains non-ascii characters',
+      actual: claimFromIPFS,
+      expected: claim
+    })
   }
 })
 
