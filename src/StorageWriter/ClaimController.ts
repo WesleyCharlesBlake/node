@@ -10,14 +10,14 @@ import { uploadClaimError, updateClaimHashError } from './Errors'
 import { IPFS } from './IPFS'
 
 enum LogTypes {
-  'info' = 'info',
-  'trace' = 'trace',
-  'error' = 'error',
+  info = 'info',
+  trace = 'trace',
+  error = 'error',
 }
 
 interface StoreNextClaimData {
-  claim: Claim
-  ipfsFileHash?: string
+  readonly claim: Claim
+  readonly ipfsFileHash?: string
 }
 
 @injectable()
