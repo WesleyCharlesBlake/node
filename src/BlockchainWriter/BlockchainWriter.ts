@@ -3,7 +3,7 @@ import { injectable, Container } from 'inversify'
 import { Collection, MongoClient } from 'mongodb'
 import * as Pino from 'pino'
 
-import { BitcoinRPCConfiguration } from 'Configuration'
+import { bitcoinRPCConfigurationToBitcoinCoreArguments } from 'Helpers/Configuration'
 import { createModuleLogger } from 'Helpers/Logging'
 import { Messaging } from 'Messaging/Messaging'
 
@@ -76,11 +76,3 @@ const createContainer = (
 
   return container
 }
-
-const bitcoinRPCConfigurationToBitcoinCoreArguments = (configuration: BitcoinRPCConfiguration) => ({
-  host: configuration.bitcoinUrl,
-  port: configuration.bitcoinPort,
-  network: configuration.bitcoinNetwork,
-  username: configuration.bitcoinUsername,
-  password: configuration.bitcoinPassword,
-})
