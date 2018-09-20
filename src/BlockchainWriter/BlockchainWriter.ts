@@ -17,11 +17,6 @@ import { ServiceConfiguration } from './ServiceConfiguration'
 export class BlockchainWriter {
   private readonly logger: Pino.Logger
   private readonly configuration: BlockchainWriterConfiguration
-  private readonly container = new Container()
-  private dbConnection: Db
-  private router: Router
-  private messaging: Messaging
-  private service: Service
 
   constructor(configuration: BlockchainWriterConfiguration) {
     this.configuration = configuration
@@ -30,51 +25,55 @@ export class BlockchainWriter {
 
   async start() {
     this.logger.info({ configuration: this.configuration }, 'BlockchainWriter Starting')
+
     const mongoClient = await MongoClient.connect(this.configuration.dbUrl)
-    this.dbConnection = await mongoClient.db()
+    const dbConnection = await mongoClient.db()
 
-    this.messaging = new Messaging(this.configuration.rabbitmqUrl)
-    await this.messaging.start()
+    const container = createContainer(this.configuration, this.logger, dbConnection)
 
-    this.initializeContainer()
+    const messaging = container.get('Messaging') as Messaging
+    await messaging.start()
 
-    this.router = this.container.get('Router')
-    await this.router.start()
+    const router = container.get('Router') as Router
+    await router.start()
 
-    this.service = this.container.get('Service')
-    await this.service.start()
+    const service = container.get('Service') as Service
+    await service.start()
 
-    await this.createIndices()
+    // await this.createIndices()
 
     this.logger.info('BlockchainWriter Started')
   }
 
-  initializeContainer() {
-    this.container.bind<Pino.Logger>('Logger').toConstantValue(this.logger)
-    this.container.bind<Db>('DB').toConstantValue(this.dbConnection)
-    this.container.bind<Router>('Router').to(Router)
-    this.container.bind<ClaimController>('ClaimController').to(ClaimController)
-    this.container.bind<Messaging>('Messaging').toConstantValue(this.messaging)
-    this.container.bind<BitcoinCore>('BitcoinCore').toConstantValue(
-      new BitcoinCore({
-        host: this.configuration.bitcoinUrl,
-        port: this.configuration.bitcoinPort,
-        network: this.configuration.bitcoinNetwork,
-        username: this.configuration.bitcoinUsername,
-        password: this.configuration.bitcoinPassword,
-      })
-    )
-    this.container
-      .bind<ClaimControllerConfiguration>('ClaimControllerConfiguration')
-      .toConstantValue(this.configuration)
-    this.container.bind<Service>('Service').to(Service)
-    this.container.bind<ServiceConfiguration>('ServiceConfiguration').toConstantValue({
-      timestampIntervalInSeconds: this.configuration.timestampIntervalInSeconds,
-    })
-  }
+  // private async createIndices() {
+  //   const collection = this.dbConnection.collection('blockchainWriter')
+  //   await collection.createIndex({ ipfsDirectoryHash: 1 }, { unique: true })
+  // }
+}
 
-  private async createIndices() {
-    const collection = this.dbConnection.collection('blockchainWriter')
-    await collection.createIndex({ ipfsDirectoryHash: 1 }, { unique: true })
-  }
+const createContainer = (configuration: BlockchainWriterConfiguration, logger: Pino.Logger, dbConnection: Db) => {
+  const container = new Container()
+
+  container.bind<Router>('Router').to(Router)
+  container.bind<ClaimController>('ClaimController').to(ClaimController)
+  container.bind<Service>('Service').to(Service)
+
+  container.bind<Pino.Logger>('Logger').toConstantValue(logger)
+  container.bind<Db>('DB').toConstantValue(dbConnection)
+  container.bind<Messaging>('Messaging').toConstantValue(new Messaging(configuration.rabbitmqUrl))
+  container.bind<BitcoinCore>('BitcoinCore').toConstantValue(
+    new BitcoinCore({
+      host: this.configuration.bitcoinUrl,
+      port: this.configuration.bitcoinPort,
+      network: this.configuration.bitcoinNetwork,
+      username: this.configuration.bitcoinUsername,
+      password: this.configuration.bitcoinPassword,
+    })
+  )
+  container.bind<ServiceConfiguration>('ServiceConfiguration').toConstantValue({
+    timestampIntervalInSeconds: this.configuration.timestampIntervalInSeconds,
+  })
+  container.bind<ClaimControllerConfiguration>('ClaimControllerConfiguration').toConstantValue(this.configuration)
+
+  return container
 }
