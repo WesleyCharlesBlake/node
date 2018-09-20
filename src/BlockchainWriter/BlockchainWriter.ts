@@ -7,8 +7,8 @@ import { createModuleLogger } from 'Helpers/Logging'
 import { Messaging } from 'Messaging/Messaging'
 
 import { BlockchainWriterConfiguration } from './BlockchainWriterConfiguration'
-import { ClaimController } from './ClaimController'
-import { ClaimControllerConfiguration } from './ClaimControllerConfiguration'
+import { Controller } from './Controller'
+import { ControllerConfiguration } from './ControllerConfiguration'
 import { Router } from './Router'
 import { Service } from './Service'
 import { ServiceConfiguration } from './ServiceConfiguration'
@@ -55,7 +55,7 @@ const createContainer = (configuration: BlockchainWriterConfiguration, logger: P
   const container = new Container()
 
   container.bind<Router>('Router').to(Router)
-  container.bind<ClaimController>('ClaimController').to(ClaimController)
+  container.bind<Controller>('Controller').to(Controller)
   container.bind<Service>('Service').to(Service)
 
   container.bind<Pino.Logger>('Logger').toConstantValue(logger)
@@ -73,7 +73,7 @@ const createContainer = (configuration: BlockchainWriterConfiguration, logger: P
   container.bind<ServiceConfiguration>('ServiceConfiguration').toConstantValue({
     timestampIntervalInSeconds: this.configuration.timestampIntervalInSeconds,
   })
-  container.bind<ClaimControllerConfiguration>('ClaimControllerConfiguration').toConstantValue(this.configuration)
+  container.bind<ControllerConfiguration>('ClaimControllerConfiguration').toConstantValue(this.configuration)
 
   return container
 }
