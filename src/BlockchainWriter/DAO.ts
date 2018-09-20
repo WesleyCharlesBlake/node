@@ -9,18 +9,18 @@ export class DAO {
     this.blockchainWriterCollection = blockchainWriterCollection
   }
 
-  start = async () => {
+  readonly start = async () => {
     await this.blockchainWriterCollection.createIndex({ ipfsDirectoryHash: 1 }, { unique: true })
   }
 
-  insertIpfsDirectoryHash = (ipfsDirectoryHash: string) =>
+  readonly insertIpfsDirectoryHash = (ipfsDirectoryHash: string) =>
     this.blockchainWriterCollection.insertOne({
       ipfsDirectoryHash,
       txId: null,
     })
 
-  findTransactionlessEntry = () => this.blockchainWriterCollection.findOne({ txId: null })
+  readonly findTransactionlessEntry = () => this.blockchainWriterCollection.findOne({ txId: null })
 
-  setTransactionId = (ipfsDirectoryHash: string, txId: string) =>
+  readonly setTransactionId = (ipfsDirectoryHash: string, txId: string) =>
     this.blockchainWriterCollection.updateOne({ ipfsDirectoryHash }, { $set: { txId } }, { upsert: true })
 }
