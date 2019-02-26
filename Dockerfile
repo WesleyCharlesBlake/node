@@ -1,4 +1,4 @@
-FROM node:10.14.2-alpine as builder
+FROM poetapp/base:10.14.2-alpine as builder
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -6,8 +6,7 @@ WORKDIR /usr/src/app
 COPY package*.json /usr/src/app/
 COPY . /usr/src/app/
 
-RUN apk add --no-cache --virtual .gyp python make git g++ libtool autoconf automake rsync \
-    && npm ci
+RUN npm ci
 
 RUN npm run build
 
