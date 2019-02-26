@@ -38,3 +38,4 @@ jobs:
       # docker build
       - run: docker build -t poet-node .
       - run: docker images
+      - run: docker ps -a
