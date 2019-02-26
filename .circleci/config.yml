@@ -9,6 +9,7 @@ jobs:
      - setup_remote_docker: 
         # docker_layer_caching: true 
     # DLC will explicitly cache layers here and try to avoid rebuilding.
+     - run: chmod a+x Docker/tools/wait-for-it.sh
      - run: docker-compose up -d
      - run: docker images
      - run: docker ps -a
