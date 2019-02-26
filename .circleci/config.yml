@@ -3,15 +3,43 @@ jobs:
  build: 
    docker: 
      # DLC does nothing here, its caching depends on commonality of the image layers.
-     - image: circleci/node:10.14.2
+      - image: poetapp/base:10.14.2-alpine
+
+      - image: mongo:3.7
+        name: mongo
+        environment:
+          MONGO_DATA_DIR: /data/db
+          MONGO_LOG_DIR: /dev/null
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: rootPass
+          POET_DB: poet
+          POET_DB_USER: poet
+          POET_DB_PASSWORD: poetPass
+
+      - image: rabbitmq:3
+        name: rabbit
+        environment:
+          RABBITMQ_ERLANG_COOKIE: some_secret_cookie
+          RABBITMQ_DEFAULT_USER: admin
+          RABBITMQ_DEFAULT_PASS: adminPass
+
+      - image: ipfs/go-ipfs:v0.4.18
+        name: ipfs
+
+      - image: ruimarinho/bitcoin-core:0.17.0
+        name: bitcoind-1
+
+          
+      - image: ruimarinho/bitcoin-core:0.17.0
+        name: bitcoind-2
+
+  
    steps: 
      - checkout 
      - setup_remote_docker: 
         # docker_layer_caching: true 
     # DLC will explicitly cache layers here and try to avoid rebuilding.
-     - run: chmod a+x Docker/tools/wait-for-it.sh
-     - run: docker-compose up -d
-     - run: docker images
+     - run: docker-compose up -d poet-node poet-node-blockchain-writer
      - run: docker ps -a
      - run: docker-compose logs poet-node
      - run: docker-compose exec poet-node npm run lint
