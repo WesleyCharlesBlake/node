@@ -39,8 +39,8 @@ jobs:
      - setup_remote_docker: 
         # docker_layer_caching: true 
     # DLC will explicitly cache layers here and try to avoid rebuilding.
-     - run: docker-compose up -d poet-node poet-node-blockchain-writer
+     - run: docker-compose up -d -f .circleci/docker-compose.yml
      - run: docker ps -a
-     - run: docker-compose logs poet-node
-     - run: docker-compose exec poet-node npm run lint
-     - run: docker-compose exec poet-node npm run coverage
+     - run: docker-compose logs poet-node -f .circleci/docker-compose.yml
+     - run: docker-compose exec poet-node npm run lint -f .circleci/docker-compose.yml
+     - run: docker-compose exec poet-node npm run coverage -f .circleci/docker-compose.yml

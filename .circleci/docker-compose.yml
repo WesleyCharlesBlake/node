@@ -1,0 +1,37 @@
+version: '3.6'
+
+services:
+
+
+  poet-node:
+    build: ../
+    ports:
+      - "18080:18080"
+    environment:
+      - POET_SERVICE=node
+      - BITCOIN_URL=bitcoind-1
+      - BITCOIN_URL_B=bitcoind-2
+      - RABBITMQ_URL=amqp://admin:adminPass@rabbit
+      - MONGODB_HOST=mongo
+      - MONGODB_USER=poet
+      - MONGODB_PASSWORD=poetPass
+      - IPFS_URL=http://ipfs:5001
+      - IPFS_ARCHIVE_URL_PREFIX=http://ipfs:8080/ipfs
+      - INTEGRATION_TEST_NODE_URL=http://poet-node:18080
+      - GH_TOKEN=${GH_TOKEN:-''}
+      - NPM_TOKEN=${NPM_TOKEN:-''}
+    command: npm run start
+
+  poet-node-blockchain-writer:
+    build: ../
+    environment:
+      - POET_SERVICE=blockchain-writer
+      - BITCOIN_URL=bitcoind-1
+      - BITCOIN_URL_B=bitcoind-2
+      - RABBITMQ_URL=amqp://admin:adminPass@rabbit
+      - MONGODB_HOST=mongo
+      - MONGODB_USER=poet
+      - MONGODB_PASSWORD=poetPass
+      - GH_TOKEN=${GH_TOKEN:-''}
+      - NPM_TOKEN=${NPM_TOKEN:-''}
+    command: npm run start:blockchain-writer
