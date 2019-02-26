@@ -3,7 +3,7 @@ jobs:
  build: 
    docker: 
      # DLC does nothing here, its caching depends on commonality of the image layers.
-      - image: poetapp/base:10.14.2-alpine
+      - image: circleci/node:10.14.2
 
       - image: mongo:3.7
         name: mongo
