@@ -13,9 +13,6 @@ services:
       - POET_DB=poet
       - POET_DB_USER=poet
       - POET_DB_PASSWORD=poetPass
-      - MONGODB_USER="poet"
-      - MONGODB_DATABASE="poet"
-      - MONGODB_PASS="poetPass"
     volumes:
       - db:/data/db
       - ./mongodb:/docker-entrypoint-initdb.d
@@ -114,7 +111,7 @@ services:
       - mongo
       - rabbit
       - ipfs
-    command: 'npm run start'
+    command: sh -c '/wait-for-it.sh mongo:27017 -- /wait-for-it.sh rabbit:5672 -t 30 -- npm run start'
   poet-node-blockchain-writer:
     build: .
     depends_on:
@@ -140,8 +137,7 @@ services:
       - rabbit
       - bitcoind-1
       - bitcoind-2
-    command: 'npm run start:blockchain-writer'
-
+    command: sh -c '/wait-for-it.sh mongo:27017 -- /wait-for-it.sh rabbit:5672 -t 30 -- npm run start:blockchain-writer'
 
 volumes:
   db:
