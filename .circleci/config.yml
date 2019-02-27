@@ -6,7 +6,6 @@ jobs:
       - image: circleci/node:10.14.2
 
       - image: mongo:3.7
-        name: mongo
         environment:
           MONGO_DATA_DIR: /data/db
           MONGO_LOG_DIR: /dev/null
@@ -17,17 +16,14 @@ jobs:
           POET_DB_PASSWORD: poetPass
 
       - image: rabbitmq:3
-        name: rabbit
         environment:
           RABBITMQ_ERLANG_COOKIE: some_secret_cookie
           RABBITMQ_DEFAULT_USER: admin
           RABBITMQ_DEFAULT_PASS: adminPass
 
       - image: ipfs/go-ipfs:v0.4.18
-        name: ipfs
 
       - image: ruimarinho/bitcoin-core:0.17.0
-        name: bitcoind-1
         command:
           -printtoconsole
           -server
@@ -39,7 +35,7 @@ jobs:
           -deprecatedrpc=signrawtransaction
           
       - image: ruimarinho/bitcoin-core:0.17.0
-        name: bitcoind-2
+        command:
           -printtoconsole
           -server
           -testnet=${USE_BTC_TESTNET:-0}
