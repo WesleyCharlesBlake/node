@@ -2,9 +2,9 @@ version: '3.6'
 
 services:
 
-
   poet-node:
-    build: ../
+    build:
+      context: ../
     ports:
       - "18080:18080"
     environment:
@@ -21,9 +21,11 @@ services:
       - GH_TOKEN=${GH_TOKEN:-''}
       - NPM_TOKEN=${NPM_TOKEN:-''}
     command: npm run start
+    network_mode: host
 
   poet-node-blockchain-writer:
-    build: ../
+    build:
+      context: ../
     environment:
       - POET_SERVICE=blockchain-writer
       - BITCOIN_URL=bitcoind-1
@@ -35,3 +37,4 @@ services:
       - GH_TOKEN=${GH_TOKEN:-''}
       - NPM_TOKEN=${NPM_TOKEN:-''}
     command: npm run start:blockchain-writer
+    network_mode: host
