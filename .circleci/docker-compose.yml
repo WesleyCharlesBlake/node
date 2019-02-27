@@ -9,15 +9,15 @@ services:
       - "18080:18080"
     environment:
       - POET_SERVICE=node
-      - BITCOIN_URL=bitcoind-1
-      - BITCOIN_URL_B=bitcoind-2
-      - RABBITMQ_URL=amqp://admin:adminPass@rabbit
-      - MONGODB_HOST=mongo
+      - BITCOIN_URL=localhost
+      - BITCOIN_URL_B=localhost
+      - RABBITMQ_URL=amqp://admin:adminPass@localhost
+      - MONGODB_HOST=localhost
       - MONGODB_USER=poet
       - MONGODB_PASSWORD=poetPass
-      - IPFS_URL=http://ipfs:5001
-      - IPFS_ARCHIVE_URL_PREFIX=http://ipfs:8080/ipfs
-      - INTEGRATION_TEST_NODE_URL=http://poet-node:18080
+      - IPFS_URL=http://localhost:5001
+      - IPFS_ARCHIVE_URL_PREFIX=http://localhost:8080/ipfs
+      - INTEGRATION_TEST_NODE_URL=http://localhost:18080
       - GH_TOKEN=${GH_TOKEN:-''}
       - NPM_TOKEN=${NPM_TOKEN:-''}
     command: npm run start
@@ -28,10 +28,10 @@ services:
       context: ../
     environment:
       - POET_SERVICE=blockchain-writer
-      - BITCOIN_URL=bitcoind-1
-      - BITCOIN_URL_B=bitcoind-2
-      - RABBITMQ_URL=amqp://admin:adminPass@rabbit
-      - MONGODB_HOST=mongo
+      - BITCOIN_URL=localhost
+      - BITCOIN_URL_B=localhost
+      - RABBITMQ_URL=amqp://admin:adminPass@localhost
+      - MONGODB_HOST=localhost
       - MONGODB_USER=poet
       - MONGODB_PASSWORD=poetPass
       - GH_TOKEN=${GH_TOKEN:-''}
