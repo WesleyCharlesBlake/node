@@ -13,6 +13,9 @@ services:
       - POET_DB=poet
       - POET_DB_USER=poet
       - POET_DB_PASSWORD=poetPass
+      - MONGODB_USER="poet"
+      - MONGODB_DATABASE="poet"
+      - MONGODB_PASS="poetPass"
     volumes:
       - db:/data/db
       - ./mongodb:/docker-entrypoint-initdb.d
@@ -99,6 +102,7 @@ services:
       - MONGODB_HOST=mongo
       - MONGODB_USER=poet
       - MONGODB_PASSWORD=poetPass
+      - MONGODB_DATABASE=poet
       - IPFS_URL=http://ipfs:5001
       - IPFS_ARCHIVE_URL_PREFIX=http://ipfs:8080/ipfs
       - INTEGRATION_TEST_NODE_URL=http://poet-node:18080
@@ -126,6 +130,7 @@ services:
       - MONGODB_HOST=mongo
       - MONGODB_USER=poet
       - MONGODB_PASSWORD=poetPass
+      - MONGODB_DATABASE=poet
       - GH_TOKEN=${GH_TOKEN:-''}
       - NPM_TOKEN=${NPM_TOKEN:-''}
     volumes:
