@@ -110,7 +110,7 @@ services:
       - mongo
       - rabbit
       - ipfs
-    command: sh -c '/wait-for-it.sh mongo:27017 -- /wait-for-it.sh rabbit:5672 -t 30 -- npm run start'
+    command: 'npm run start'
   poet-node-blockchain-writer:
     build: .
     depends_on:
@@ -135,7 +135,7 @@ services:
       - rabbit
       - bitcoind-1
       - bitcoind-2
-    command: sh -c '/wait-for-it.sh mongo:27017 -- /wait-for-it.sh rabbit:5672 -t 30 -- npm run start:blockchain-writer'
+    command: 'npm run start:blockchain-writer'
 
 
 volumes:
