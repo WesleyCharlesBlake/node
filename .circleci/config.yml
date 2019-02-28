@@ -1,15 +1,62 @@
-version: 2 
-jobs: 
-  build: 
-    machine: true
-    docker_layer_caching: true
-    steps: 
-      - checkout 
-      # - setup_remote_docker: 
-        # docker_layer_caching: true 
-    # DLC will explicitly cache layers here and try to avoid rebuilding.
-      - run: docker-compose up -d 
-      - run: docker-compose exec poet-node npm run lint
-      - run: docker-compose exec poet-node npm run coverage
-      - run: docker ps -a
-      - run: docker-compose logs poet-node
+# version: 2 
+# jobs: 
+#   build: 
+#     machine: true
+#     docker_layer_caching: true
+#     steps: 
+#       - checkout 
+#       # - setup_remote_docker: 
+#         # docker_layer_caching: true 
+#     # DLC will explicitly cache layers here and try to avoid rebuilding.
+#       - run: docker-compose up -d 
+#       - run: docker-compose exec poet-node npm run lint
+#       - run: docker-compose exec poet-node npm run coverage
+#       - run: docker ps -a
+#       - run: docker-compose logs poet-node
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: poetapp/base:10.14.2-alpine
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Install npm
+          command: npm ci
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+  test:
+    docker:
+      - image: poetapp/base:10.14.2-alpine
+      - image: mongo:3.7
+      - image: rabbitmq:3
+      - image: ipfs/go-ipfs:v0.4.18
+    steps:
+      - checkout
+      - run:
+          name: Test
+          command: npm run lint
+      - run:
+          name: Generate code coverage
+          command: npm run coverage
+
+      - store_artifacts:
+          path: .coverage
+          prefix: coverage
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
