@@ -105,13 +105,13 @@ services:
       - INTEGRATION_TEST_NODE_URL=http://poet-node:18080
       - GH_TOKEN=${GH_TOKEN:-''}
       - NPM_TOKEN=${NPM_TOKEN:-''}
-    volumes:
-      - ./Docker/tools/wait-for-it.sh:/wait-for-it.sh
+    #volumes:
+    #  - ./Docker/tools/wait-for-it.sh:/wait-for-it.sh
     links:
       - mongo
       - rabbit
       - ipfs
-    command: sh -c '/wait-for-it.sh mongo:27017 -- /wait-for-it.sh rabbit:5672 -t 30 -- npm run start'
+    command: sleep 30 && npm run start
   poet-node-blockchain-writer:
     build: .
     depends_on:
@@ -130,14 +130,14 @@ services:
       - MONGODB_DATABASE=poet
       - GH_TOKEN=${GH_TOKEN:-''}
       - NPM_TOKEN=${NPM_TOKEN:-''}
-    volumes:
-      - ./Docker/tools/wait-for-it.sh:/wait-for-it.sh
+    #volumes:
+    #  - ./Docker/tools/wait-for-it.sh:/wait-for-it.sh
     links:
       - mongo
       - rabbit
       - bitcoind-1
       - bitcoind-2
-    command: sh -c '/wait-for-it.sh mongo:27017 -- /wait-for-it.sh rabbit:5672 -t 30 -- npm run start:blockchain-writer'
+    command: npm run start:blockchain-writer
 
 volumes:
   db:
