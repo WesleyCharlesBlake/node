@@ -9,7 +9,7 @@ jobs:
         # docker_layer_caching: true 
     # DLC will explicitly cache layers here and try to avoid rebuilding.
       - run: docker-compose up -d 
-      - run: docker ps -a
-      - run: docker-compose logs poet-node
       - run: docker-compose exec poet-node npm run lint
       - run: docker-compose exec poet-node npm run coverage
+      - run: docker ps -a
+      - run: docker-compose logs poet-node
