@@ -37,6 +37,8 @@ jobs:
       - image: rabbitmq:3
       - image: ipfs/go-ipfs:v0.4.18
     steps:
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
       - checkout
       - run:
           name: Test
