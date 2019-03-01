@@ -22,14 +22,24 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: Install npm
           command: npm ci
       - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
+  lint:
+    docker:
+      - image: poetapp/base:10.14.2-alpine
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Test
+          command: npm run lint
   test:
     docker:
       - image: poetapp/base:10.14.2-alpine
@@ -37,25 +47,24 @@ jobs:
       - image: rabbitmq:3
       - image: ipfs/go-ipfs:v0.4.18
     steps:
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
       - checkout
-      - run:
-          name: Test
-          command: npm run lint
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: Generate code coverage
           command: npm run coverage
-
-      - store_artifacts:
-          path: .coverage
-          prefix: coverage
 
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build
+      - lint:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
       - test:
           requires:
             - build
