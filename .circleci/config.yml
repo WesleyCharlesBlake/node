@@ -89,14 +89,14 @@ jobs:
               -e POET_SERVICE=node \
               -e BITCOIN_URL=bitcoind-1 \
               -e BITCOIN_URL_B=bitcoind-2 \
-              -e RABBITMQ_URL=amqp://admin:adminPass@rabbit \
-              -e MONGODB_HOST=mongo \
+              -e RABBITMQ_URL=amqp://admin:adminPass@localhost \
+              -e MONGODB_HOST=localhost \
               -e MONGODB_USER=admin \
               -e MONGODB_PASSWORD=adminPass \
               -e MONGODB_DATABASE=poet \
-              -e IPFS_URL=http://ipfs:5001 \
-              -e IPFS_ARCHIVE_URL_PREFIX=http://ipfs:8080/ipfs \
-              -e INTEGRATION_TEST_NODE_URL=http://poet-node:18080 \
+              -e IPFS_URL=http://localhost:5001 \
+              -e IPFS_ARCHIVE_URL_PREFIX=http://localhost:8080/ipfs \
+              -e INTEGRATION_TEST_NODE_URL=http://localhost:18080 \
               --name=poet-node \
               $IMAGE_NAME:latest
       - run:
