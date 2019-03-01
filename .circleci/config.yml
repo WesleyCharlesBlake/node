@@ -60,8 +60,8 @@ jobs:
             docker run -d -p 27017:27017 \
               -e MONGO_DATA_DIR=/data/db \
               -e MONGO_LOG_DIR=/dev/null \
-              -e MONGO_INITDB_ROOT_USERNAME=root \
-              -e MONGO_INITDB_ROOT_PASSWORD=rootPass \
+              -e MONGO_INITDB_ROOT_USERNAME=admin \
+              -e MONGO_INITDB_ROOT_PASSWORD=adminPass \
               --name=mongo \
               mongo:3.7
 
@@ -97,8 +97,8 @@ jobs:
               -e BITCOIN_URL_B=bitcoind-2 \
               -e RABBITMQ_URL=amqp://admin:adminPass@rabbit \
               -e MONGODB_HOST=mongo \
-              -e MONGODB_USER=root \
-              -e MONGODB_PASSWORD=rootPass \
+              -e MONGODB_USER=admin \
+              -e MONGODB_PASSWORD=adminPass \
               -e MONGODB_DATABASE=poet \
               -e IPFS_URL=http://ipfs:5001 \
               -e IPFS_ARCHIVE_URL_PREFIX=http://ipfs:8080/ipfs \
