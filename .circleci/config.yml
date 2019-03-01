@@ -98,6 +98,7 @@ jobs:
               -e IPFS_ARCHIVE_URL_PREFIX=http://localhost:8080/ipfs \
               -e INTEGRATION_TEST_NODE_URL=http://localhost:18080 \
               --name=poet-node \
+              --network="host" \
               $IMAGE_NAME:latest
       - run:
           name: Run coverage in container
