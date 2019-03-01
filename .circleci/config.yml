@@ -1,24 +1,13 @@
-# version: 2 
-# jobs: 
-#   build: 
-#     machine: true
-#     docker_layer_caching: true
-#     steps: 
-#       - checkout 
-#       # - setup_remote_docker: 
-#         # docker_layer_caching: true 
-#     # DLC will explicitly cache layers here and try to avoid rebuilding.
-#       - run: docker-compose up -d 
-#       - run: docker-compose exec poet-node npm run lint
-#       - run: docker-compose exec poet-node npm run coverage
-#       - run: docker ps -a
-#       - run: docker-compose logs poet-node
-
-version: 2
-jobs:
-  build:
+version: 2.1
+executors:
+  docker-publisher:
+    environment:
+      IMAGE_NAME: poetapp/node
     docker:
       - image: poetapp/base:10.14.2-alpine
+jobs:
+  build:
+    executor: docker-publisher
     steps:
       - checkout
       - restore_cache:
@@ -41,11 +30,21 @@ jobs:
           name: Test
           command: npm run lint
   test:
+    executor: docker-publisher
     docker:
-      - image: poetapp/base:10.14.2-alpine
       - image: mongo:3.7
       - image: rabbitmq:3
       - image: ipfs/go-ipfs:v0.4.18
+      - image: ruimarinho/bitcoin-core:0.17.0
+        command: |       
+          -printtoconsole
+          -server
+          -regtest=1
+          -rpcuser=bitcoinrpcuser
+          -rpcpassword=bitcoinrpcpassword
+          -rpcallowip=::/0
+          -deprecatedrpc=signrawtransaction
+
     steps:
       - checkout
       - restore_cache:
