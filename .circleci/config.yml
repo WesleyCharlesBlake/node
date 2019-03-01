@@ -83,7 +83,7 @@ jobs:
           name: Wait for rabbitmq
           command: dockerize -wait tcp://localhost:5672 -timeout 1m
       - run:
-          name: Run $IMAGE_NAME
+          name: Run node
           command: |
             docker run -d -p 18080:18080 \
               -e POET_SERVICE=node \
@@ -99,8 +99,13 @@ jobs:
               -e INTEGRATION_TEST_NODE_URL=http://poet-node:18080 \
               --name=poet-node \
               $IMAGE_NAME:latest
-
-
+      - run:
+          name: Run coverage in container
+          command: |
+            docker ps -a
+            docker logs poet-node
+            docker run -ti $IMAGE_NAME:latest npm run coverage
+        
   # publish:
   #   executor: docker-publisher
   #   steps:
