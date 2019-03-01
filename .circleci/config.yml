@@ -37,6 +37,77 @@ jobs:
           command: |
             docker run -ti $IMAGE_NAME:latest npm run lint
 
+  coverage:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Run lint in container
+          command: |
+            docker run -p 27017:27017  \
+              -e MONGO_DATA_DIR=/data/db \
+              -e MONGO_LOG_DIR=/dev/null \ 
+              -e MONGO_INITDB_ROOT_USERNAME=root \
+              -e MONGO_INITDB_ROOT_PASSWORD=rootPass \
+              --name=mongo \
+              mongo:3.7
+
+            docker run -p 5671:5671 -p 5672:5672 \
+              -e RABBITMQ_ERLANG_COOKIE=some_secret_cookie \
+              -e RABBITMQ_DEFAULT_USER=admin \
+              -e RABBITMQ_DEFAULT_PASS=adminPass \
+              --name=rabbit \
+              rabbitmq:3
+
+            docker run -p 8080:8080 -p 4001:4001 -p 5001:5001 --name=ipfs ipfs/go-ipfs:v0.4.18
+
+            docker run -p 18443:18443 \
+              --name=bitcoind-1 \
+              ruimarinho/bitcoin-core:0.17.0 \
+              -printtoconsole \
+              -server \
+              -testnet=${USE_BTC_TESTNET:-0} \
+              -regtest=${USE_BTC_REGTEST:-1} \
+              -rpcuser=bitcoinrpcuser \
+              -rpcpassword=bitcoinrpcpassword \
+              -rpcallowip=::/0 \
+              -deprecatedrpc=signrawtransaction
+
+            docker run -p 19443:18443 \
+              --name=bitcoind-2 \
+              ruimarinho/bitcoin-core:0.17.0 \
+              -printtoconsole \
+              -server \
+              -testnet=${USE_BTC_TESTNET:-0} \
+              -regtest=${USE_BTC_REGTEST:-1} \
+              -rpcuser=bitcoinrpcuser \
+              -rpcpassword=bitcoinrpcpassword \
+              -rpcallowip=::/0 \
+              -deprecatedrpc=signrawtransaction
+
+            docker run -p 18080:18080 \
+              -e POET_SERVICE=node \
+              -e BITCOIN_URL=bitcoind-1 \
+              -e BITCOIN_URL_B=bitcoind-2 \
+              -e RABBITMQ_URL=amqp://admin:adminPass@rabbit \
+              -e MONGODB_HOST=mongo \
+              -e MONGODB_USER=root \
+              -e MONGODB_PASSWORD=rootPass \
+              -e MONGODB_DATABASE=poet \
+              -e IPFS_URL=http://ipfs:5001 \
+              -e IPFS_ARCHIVE_URL_PREFIX=http://ipfs:8080/ipfs \
+              -e INTEGRATION_TEST_NODE_URL=http://poet-node:18080 \
+              --name=poet-node \
+              $IMAGE_NAME:latest \
+              npm run coverage
+
+
   # publish:
   #   executor: docker-publisher
   #   steps:
@@ -58,6 +129,12 @@ workflows:
     jobs:
       - build
       - lint:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - coverage:
           requires:
             - build
           filters:
