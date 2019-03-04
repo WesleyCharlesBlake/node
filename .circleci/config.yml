@@ -82,8 +82,8 @@ jobs:
           name: start node
           command: nohup npm start 2>/dev/null 1>/dev/null&
       - run:
-          name: Wait for rabbitmq
-          command: dockerize -wait http://localhost:18080 -timeout 1m
+          name: Wait for node
+          command: dockerize -wait http://localhost:18080/health -timeout 1m
       - run:
           name: Run coverage in container
           command: npm run coverage
