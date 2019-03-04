@@ -58,10 +58,19 @@ jobs:
       - run:
           name: Run coverage report
           command: docker-compose exec poet-node npm run coverage
+      - run:
+          name: get container logs
+          command: | 
+            declare -a arr=("poet-node" "poet-node-blockchain-writer" "bitcoind-1" "bitcoind-2" "mongo" "ipfs" "rabbit")
+            mkdir /tmp/logs
+            for i in "${arr[@]}"
+            do
+               docker-compose logs $i > /tmp/logs/$i.log
+            done
       - store_test_results:
           path: .coverage/
       - store_artifacts:
-          path: /root/.npm/
+          path: /tmp/logs/
   # publish:
   #   executor: docker-publisher
   #   steps:

@@ -89,6 +89,7 @@ services:
       - IPFS_URL=http://ipfs:5001
       - IPFS_ARCHIVE_URL_PREFIX=http://ipfs:8080/ipfs
       - INTEGRATION_TEST_NODE_URL=http://poet-node:18080
+      - LOGGING_LEVEL=trace
     links:
       - mongo
       - rabbit
@@ -112,6 +113,7 @@ services:
       - MONGODB_USER=poet
       - MONGODB_PASSWORD=poetPass
       - MONGODB_DATABASE=poet
+      - LOGGING_LEVEL=trace
     links:
       - mongo
       - rabbit
