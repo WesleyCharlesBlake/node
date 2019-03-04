@@ -92,7 +92,7 @@ jobs:
       INTEGRATION_TEST_NODE_URL: http:/localhost:18080
       BITCOIN_URL: bitcoind-1
       BITCOIN_URL_B: bitcoind-2
-      LOGGING_LEVL: error
+      LOGGING_LEVEL: error
     executor: coverage-builder
     steps:
       - checkout
@@ -126,7 +126,7 @@ jobs:
           name: Run coverage in container
           command: npm run coverage
       - store_test_results:
-          path: .coverage
+          path: .coverage/*
       - store_artifacts:
           path: /root/.npm/
 
