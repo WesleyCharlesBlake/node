@@ -10,9 +10,9 @@ executors:
     environment:
       IMAGE_NAME: poetapp/node
       DOCKERIZE_VERSION: v0.3.0
-      MONGODB_USER: admin
-      MONGODB_PASSWORD: admin
-      MONGODB_DATABASE: poet
+      MONGODB_USER: ""
+      MONGODB_PASSWORD: ""
+      MONGODB_DATABASE: ""
 
     docker:
       - image: poetapp/base:10.14.2-alpine
