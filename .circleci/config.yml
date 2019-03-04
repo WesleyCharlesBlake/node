@@ -15,7 +15,7 @@ executors:
       - image: poetapp/base:10.14.2-alpine
 
       # this containers make up the node dep services, which run in the primary container      
-      - name: poet-node
+      - name: mongo
         image: poetapp/mongo-ci:4.0.6
 
       - name: rabbit
