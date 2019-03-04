@@ -62,8 +62,10 @@ jobs:
           name: get container logs
           command: |
             declare -a arr=("poet-node" "poet-node-blockchain-writer" "bitcoind-1" "bitcoind-2" "mongo" "ipfs" "rabbit")
-            mkdir /tmp/logs
-            for i in "${arr[@]}"; do docker-compose logs $i > /tmp/logs/$i.log; done
+            mkdir -p /tmp/logs/{docker,npm/{node,"blockchain-writer"}}
+            for i in "${arr[@]}"; do docker-compose logs $i > /tmp/logs/docker/$i.log; done
+            docker cp workspace_poet-node_1:/root/.npm/_logs/ /tmp/logs/npm/node/
+            docker cp workspace_poet-node-blockchain-writer_1:/root/.npm/_logs/ /tmp/logs/npm/blockchain-writer/
           when: on_fail
       - store_test_results:
           path: .coverage/
