@@ -10,10 +10,6 @@ executors:
     environment:
       IMAGE_NAME: poetapp/node
       DOCKERIZE_VERSION: v0.3.0
-      MONGODB_USER: "poet"
-      MONGODB_PASSWORD: "poetPass"
-      MONGODB_DATABASE: "poet"
-      BITCOIN_URL: "127.0.0.1"
 
     docker:
       - image: poetapp/base:10.14.2-alpine
@@ -62,6 +58,17 @@ jobs:
           command: npm run lint
 
   coverage:
+    environment:
+      MONGODB_USER: "poet"
+      MONGODB_PASSWORD: "poetPass"
+      MONGODB_DATABASE: "poet"
+      MONGODB_HOST: localhost
+      POET_SERVICE: node
+      RABBITMQ_URL: amqp://admin:adminPass@localhost
+      IPFS_URL: http://localhost:5001
+      IPFS_ARCHIVE_URL_PREFIX: http://localhost:8080/ipfs
+      INTEGRATION_TEST_NODE_URL: http:/localhost:18080
+      BITCOIN_URL: "localhost"
     executor: coverage-builder
     steps:
       - checkout
