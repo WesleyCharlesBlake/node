@@ -90,8 +90,9 @@ jobs:
       IPFS_URL: http://ipfs:5001
       IPFS_ARCHIVE_URL_PREFIX: http://ipfs:8080/ipfs
       INTEGRATION_TEST_NODE_URL: http:/localhost:18080
-      BITCOIN_URL: "bitcoind-1"
-      BITCOIN_URL_B: "bitcoind-2"
+      BITCOIN_URL: bitcoind-1
+      BITCOIN_URL_B: bitcoind-2
+      LOGGING_LEVL: error
     executor: coverage-builder
     steps:
       - checkout
@@ -110,6 +111,14 @@ jobs:
           name: start node
           command: npm run start
           background: true
+          environment:
+            POET_SERVICE: node
+      - run:
+          name: start blockchain writer
+          command: npm run start:blockchain-writer
+          background: true
+          environment:
+            POET_SERVICE: blockchain-writer
       - run:
           name: Wait for node
           command: dockerize -wait http://localhost:18080/health -timeout 1m
@@ -117,7 +126,7 @@ jobs:
           name: Run coverage in container
           command: npm run coverage
       - store_test_results:
-          path: test-results
+          path: .coverage
       - store_artifacts:
           path: /root/.npm/
 
