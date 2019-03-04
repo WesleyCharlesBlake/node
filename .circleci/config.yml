@@ -116,7 +116,10 @@ jobs:
       - run:
           name: Run coverage in container
           command: npm run coverage
-
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: /root/.npm/
 
 workflows:
   version: 2
