@@ -1,7 +1,7 @@
 FROM poetapp/base:10.14.2-alpine as builder
 
 COPY package*.json /tmp/
-RUN cd /tmp && npm install
+RUN cd /tmp && npm ci
 RUN mkdir -p /usr/src/app/ && cp -a /tmp/node_modules /usr/src/app/
 
 WORKDIR /usr/src/app/

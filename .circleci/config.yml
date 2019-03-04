@@ -60,7 +60,8 @@ jobs:
           command: docker-compose exec poet-node npm run coverage
       - run:
           name: get container logs
-          command: | 
+          command: |
+            #!/bin/sh
             declare -a arr=("poet-node" "poet-node-blockchain-writer" "bitcoind-1" "bitcoind-2" "mongo" "ipfs" "rabbit")
             mkdir /tmp/logs
             for i in "${arr[@]}"
