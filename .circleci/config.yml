@@ -125,7 +125,7 @@ jobs:
           name: Run coverage in container
           command: npm run coverage
       - store_test_results:
-          path: .coverage/*
+          path: .coverage/
       - store_artifacts:
           path: /root/.npm/
 
