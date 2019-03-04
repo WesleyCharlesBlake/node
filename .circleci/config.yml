@@ -41,18 +41,18 @@ executors:
           "-port=18443"
         ]
 
-      # - name: bitcoind-2
-      #   image: ruimarinho/bitcoin-core:0.17.0
-      #   command: [
-      #     "-printtoconsole",
-      #     "-server",
-      #     "-regtest=1",
-      #     "-rpcuser=bitcoinrpcuser",
-      #     "-rpcpassword=bitcoinrpcpassword",
-      #     "-rpcallowip=::/0",
-      #     "-deprecatedrpc=signrawtransaction",
-      #     "-port=19443"
-      #   ]
+      #- name: bitcoind-2
+      #  image: ruimarinho/bitcoin-core:0.17.0
+      #  command: [
+      #    "-printtoconsole",
+      #    "-server",
+      #    "-regtest=1",
+      #    "-rpcuser=bitcoinrpcuser",
+      #    "-rpcpassword=bitcoinrpcpassword",
+      #    "-rpcallowip=::/0",
+      #    "-deprecatedrpc=signrawtransaction",
+      #    "-port=19443"
+      #  ]
 
 jobs:
   build:
@@ -90,7 +90,7 @@ jobs:
       IPFS_ARCHIVE_URL_PREFIX: http://ipfs:8080/ipfs
       INTEGRATION_TEST_NODE_URL: http:/localhost:18080
       BITCOIN_URL: bitcoind-1
-      BITCOIN_URL_B: bitcoind-1
+      BITCOIN_URL_B: bitcoind-2
       LOGGING_LEVEL: error
     executor: coverage-builder
     steps:
@@ -118,6 +118,7 @@ jobs:
           background: true
           environment:
             POET_SERVICE: blockchain-writer
+            BITCOIN_PORT: 18443
       - run:
           name: Wait for node
           command: dockerize -wait http://localhost:18080/health -timeout 1m
@@ -125,7 +126,7 @@ jobs:
           name: Run coverage in container
           command: npm run coverage
       - store_test_results:
-          path: .coverage/
+          path: .coverage/*
       - store_artifacts:
           path: /root/.npm/
 
