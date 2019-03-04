@@ -57,9 +57,6 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
-          name: install
-          command: npm install
-      - run:
           name: Run lint in container
           command: npm run lint
 
