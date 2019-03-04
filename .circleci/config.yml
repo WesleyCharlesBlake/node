@@ -37,7 +37,8 @@ executors:
           "-rpcuser=bitcoinrpcuser",
           "-rpcpassword=bitcoinrpcpassword",
           "-rpcallowip=::/0",
-          "-deprecatedrpc=signrawtransaction"
+          "-deprecatedrpc=signrawtransaction",
+          "-port=18443"
         ]
 
       - name: bitcoind-2
