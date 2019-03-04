@@ -15,9 +15,9 @@ executors:
     # The secondary container is an instance of the second listed image which is run in a common network where ports exposed on the primary container are available on localhost.
       - image: mongo:3.7
         command: [--smallfiles]
-        environment:
-          MONGO_INITDB_ROOT_USERNAME: admin
-          MONGO_INITDB_ROOT_PASSWORD: adminPass
+        # environment:
+        #   MONGO_INITDB_ROOT_USERNAME: admin
+        #   MONGO_INITDB_ROOT_PASSWORD: adminPass
       - image: rabbitmq:3
         environment:
           RABBITMQ_ERLANG_COOKIE: some_secret_cookie
