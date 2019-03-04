@@ -13,6 +13,7 @@ executors:
       MONGODB_USER: "poet"
       MONGODB_PASSWORD: "poetPass"
       MONGODB_DATABASE: "poet"
+      BITCOIN_URL: "127.0.0.1"
 
     docker:
       - image: poetapp/base:10.14.2-alpine
