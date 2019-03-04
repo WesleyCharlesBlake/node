@@ -85,7 +85,6 @@ jobs:
       MONGODB_PASSWORD: "poetPass"
       MONGODB_DATABASE: "poet"
       MONGODB_HOST: mongo
-      POET_SERVICE: node
       RABBITMQ_URL: amqp://admin:adminPass@rabbit
       IPFS_URL: http://ipfs:5001
       IPFS_ARCHIVE_URL_PREFIX: http://ipfs:8080/ipfs
@@ -119,6 +118,7 @@ jobs:
           background: true
           environment:
             POET_SERVICE: blockchain-writer
+            BITCOIN_PORT: 19443
       - run:
           name: Wait for node
           command: dockerize -wait http://localhost:18080/health -timeout 1m
