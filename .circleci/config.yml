@@ -83,7 +83,7 @@ jobs:
           command: npm start &
       - run:
           name: Wait for rabbitmq
-          command: dockerize -wait tcp://localhost:18080 -timeout 1m
+          command: dockerize -wait http://localhost:18080 -timeout 1m
       - run:
           name: Run coverage in container
           command: npm run coverage
