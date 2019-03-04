@@ -56,6 +56,10 @@ jobs:
           name: Start docker-compose services
           command: docker-compose up -d
       - run:
+          name: Mine blocks
+          command: docker-compose exec poet-node node scripts/regtest-watcher.js
+          background: true
+      - run:
           name: Run coverage report
           command: docker-compose exec poet-node npm run coverage
       - run:

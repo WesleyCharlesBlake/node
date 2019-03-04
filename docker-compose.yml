@@ -44,26 +44,7 @@ services:
     command:
       -printtoconsole
       -server
-      -testnet=${USE_BTC_TESTNET:-0}
-      -regtest=${USE_BTC_REGTEST:-1}
-      -rpcuser=bitcoinrpcuser
-      -rpcpassword=bitcoinrpcpassword
-      -rpcallowip=::/0
-      -deprecatedrpc=signrawtransaction
-
-  bitcoind-2:
-    image: ruimarinho/bitcoin-core:0.17.0
-    ports:
-      - "19443:18444"
-    #volumes:
-    #  - type: tmpfs
-    #    target: /home/bitcoin/.bitcoin
-    restart: always
-    command:
-      -printtoconsole
-      -server
-      -testnet=${USE_BTC_TESTNET:-0}
-      -regtest=${USE_BTC_REGTEST:-1}
+      -regtest=1
       -rpcuser=bitcoinrpcuser
       -rpcpassword=bitcoinrpcpassword
       -rpcallowip=::/0
@@ -78,11 +59,10 @@ services:
       - rabbit
       - ipfs
       - bitcoind-1
-      - bitcoind-2
     environment:
       - POET_SERVICE=node
       - BITCOIN_URL=bitcoind-1
-      - BITCOIN_URL_B=bitcoind-2
+      - BITCOIN_URL_B=bitcoind-1
       - RABBITMQ_URL=amqp://admin:adminPass@rabbit
       - MONGODB_HOST=mongo
       - MONGODB_USER=poet
@@ -97,31 +77,6 @@ services:
       - rabbit
       - ipfs
     command: ["-c", "/wait-for-it.sh rabbit:5672 && npm run start"]
-    entrypoint: ["/bin/sh"]
-
-  poet-node-blockchain-writer:
-    build: .
-    depends_on:
-      - mongo
-      - rabbit
-      - bitcoind-1
-      - bitcoind-2
-    environment:
-      - POET_SERVICE=blockchain-writer
-      - BITCOIN_URL=bitcoind-1
-      - BITCOIN_URL_B=bitcoind-2
-      - RABBITMQ_URL=amqp://admin:adminPass@rabbit
-      - MONGODB_HOST=mongo
-      - MONGODB_USER=poet
-      - MONGODB_PASSWORD=poetPass
-      - MONGODB_DATABASE=poet
-      - LOGGING_LEVEL=trace
-    links:
-      - mongo
-      - rabbit
-      - bitcoind-1
-      - bitcoind-2
-    command: ["-c", "/wait-for-it.sh rabbit:5672 && npm run start:blockchain-writer"]
     entrypoint: ["/bin/sh"]
 
 #volumes:
