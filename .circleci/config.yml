@@ -1,17 +1,17 @@
 version: 2.1
 executors:
-  docker-publisher:
+  base-node:
     environment:
       IMAGE_NAME: poetapp/node
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: poetapp/base:10.14.2
       
   coverage-builder:
     environment:
       IMAGE_NAME: poetapp/node
       DOCKERIZE_VERSION: v0.3.0
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: poetapp/base:10.14.2
     # The secondary container is an instance of the second listed image which is run in a common network where ports exposed on the primary container are available on localhost.
       - image: mongo:3.7
         environment:
@@ -37,45 +37,40 @@ executors:
 
 jobs:
   build:
-    executor: docker-publisher
+    executor: base-node
     steps:
       - checkout
-      - setup_remote_docker
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
-          name: Build Docker image
-          command: |
-            docker build -t $IMAGE_NAME:latest .
-      - run:
-          name: Archive Docker image
-          command: docker save -o image.tar $IMAGE_NAME
-      - persist_to_workspace:
-          root: .
+          name: Install deps
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
-            - ./image.tar
+            - ./node_modules
 
   lint:
-    executor: docker-publisher
+    executor: base-node
     steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - setup_remote_docker
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
-          name: Load archived Docker image
-          command: docker load -i /tmp/workspace/image.tar
+          name: install
+          command: npm install
       - run:
           name: Run lint in container
-          command: |
-            docker run -ti $IMAGE_NAME:latest npm run lint
+          command: npm run lint
 
   coverage:
     executor: coverage-builder
     steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - setup_remote_docker
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
-          name: Load archived Docker image
-          command: docker load -i /tmp/workspace/image.tar
+          name: Build dist
+          command: npm run build
       - run:
           name: Install dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz            
@@ -83,44 +78,15 @@ jobs:
           name: Wait for rabbitmq
           command: dockerize -wait tcp://localhost:5672 -timeout 1m
       - run:
-          name: Run node
-          command: |
-            docker run -d -p 18080:18080 \
-              -e POET_SERVICE=node \
-              -e BITCOIN_URL=bitcoind-1 \
-              -e BITCOIN_URL_B=bitcoind-2 \
-              -e RABBITMQ_URL=amqp://admin:adminPass@localhost \
-              -e MONGODB_HOST=localhost \
-              -e MONGODB_USER=admin \
-              -e MONGODB_PASSWORD=adminPass \
-              -e MONGODB_DATABASE=poet \
-              -e IPFS_URL=http://localhost:5001 \
-              -e IPFS_ARCHIVE_URL_PREFIX=http://localhost:8080/ipfs \
-              -e INTEGRATION_TEST_NODE_URL=http://localhost:18080 \
-              --name=poet-node \
-              --network="host" \
-              $IMAGE_NAME:latest
+          name: start node
+          command: npm start
+      - run:
+          name: Wait for rabbitmq
+          command: dockerize -wait tcp://localhost:18080 -timeout 1m
       - run:
           name: Run coverage in container
-          command: |
-            docker ps -a
-            docker logs poet-node
-            docker run -ti $IMAGE_NAME:latest npm run coverage
-        
-  # publish:
-  #   executor: docker-publisher
-  #   steps:
-  #     - attach_workspace:
-  #         at: /tmp/workspace
-  #     - setup_remote_docker
-  #     - run:
-  #         name: Load archived Docker image
-  #         command: docker load -i /tmp/workspace/image.tar
-  #     - run:
-  #         name: Publish Docker Image to Docker Hub
-  #         command: |
-  #           echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-  #           docker push $IMAGE_NAME:latest
+          command: npm run coverage
+
 
 workflows:
   version: 2
