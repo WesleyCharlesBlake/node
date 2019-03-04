@@ -44,8 +44,7 @@ services:
     command:
       -printtoconsole
       -server
-      -testnet=${USE_BTC_TESTNET:-0}
-      -regtest=${USE_BTC_REGTEST:-1}
+      -regtest=1
       -rpcuser=bitcoinrpcuser
       -rpcpassword=bitcoinrpcpassword
       -rpcallowip=::/0
@@ -62,8 +61,7 @@ services:
     command:
       -printtoconsole
       -server
-      -testnet=${USE_BTC_TESTNET:-0}
-      -regtest=${USE_BTC_REGTEST:-1}
+      -regtest=1
       -rpcuser=bitcoinrpcuser
       -rpcpassword=bitcoinrpcpassword
       -rpcallowip=::/0
@@ -91,7 +89,6 @@ services:
       - IPFS_URL=http://ipfs:5001
       - IPFS_ARCHIVE_URL_PREFIX=http://ipfs:8080/ipfs
       - INTEGRATION_TEST_NODE_URL=http://poet-node:18080
-
     links:
       - mongo
       - rabbit
@@ -115,8 +112,6 @@ services:
       - MONGODB_USER=poet
       - MONGODB_PASSWORD=poetPass
       - MONGODB_DATABASE=poet
-    volumes:
-      - ./Docker/tools/wait-for-it.sh:/wait-for-it.sh
     links:
       - mongo
       - rabbit
