@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   mongo:
-    image: mongo:3.7
+    image: poetapp/mongo-ci:4.0.6
     ports:
       - "27017:27017"
     environment:
@@ -10,12 +10,9 @@ services:
       - MONGO_LOG_DIR=/dev/null
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=rootPass
-      - POET_DB=poet
-      - POET_DB_USER=poet
-      - POET_DB_PASSWORD=poetPass
-    volumes:
-      - db:/data/db
-      - ./mongodb:/docker-entrypoint-initdb.d
+    #volumes:
+    #  - db:/data/db
+    #  - ./mongodb:/docker-entrypoint-initdb.d
 
   rabbit:
     image: rabbitmq:3
@@ -33,16 +30,16 @@ services:
       - "8080:8080"
       - "4001:4001"
       - "5001:5001"
-    volumes:
-      - data:/data/ipfs
+    #volumes:
+    #  - data:/data/ipfs
 
   bitcoind-1:
     image: ruimarinho/bitcoin-core:0.17.0
     ports:
       - "18443:18443"
-    volumes:
-      - type: tmpfs
-        target: /home/bitcoin/.bitcoin
+    #volumes:
+    #  - type: tmpfs
+    #    target: /home/bitcoin/.bitcoin
     restart: always
     command:
       -printtoconsole
@@ -72,15 +69,6 @@ services:
       -rpcallowip=::/0
       -deprecatedrpc=signrawtransaction
 
-  #k6:
-  #  build:
-  #    context: .
-  #    dockerfile: ./Docker/Dockerfile.stress
-  #  environment:
-  #    - NODE_HOST=http://poet-node:18080
-  #  volumes:
-  #    - .:/usr/src/app
-
   poet-node:
     build: .
     ports:
@@ -103,8 +91,7 @@ services:
       - IPFS_URL=http://ipfs:5001
       - IPFS_ARCHIVE_URL_PREFIX=http://ipfs:8080/ipfs
       - INTEGRATION_TEST_NODE_URL=http://poet-node:18080
-    volumes:
-      - ./Docker/tools/wait-for-it.sh:/wait-for-it.sh
+
     links:
       - mongo
       - rabbit
