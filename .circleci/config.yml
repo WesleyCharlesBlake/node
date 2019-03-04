@@ -13,11 +13,6 @@ executors:
     docker:
       - image: poetapp/base:10.14.2-alpine
     # The secondary container is an instance of the second listed image which is run in a common network where ports exposed on the primary container are available on localhost.
-      - image: mongo:3.7
-        command: [--smallfiles]
-        # environment:
-        #   MONGO_INITDB_ROOT_USERNAME: admin
-        #   MONGO_INITDB_ROOT_PASSWORD: adminPass
       - image: rabbitmq:3
         environment:
           RABBITMQ_ERLANG_COOKIE: some_secret_cookie
@@ -70,6 +65,14 @@ jobs:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Install mongodb
+          command: apk add mongodb
+      - run:
+          name: Setup Auth
+          command: |
+            mongo boss --eval 'db.createUser({ user: "boss", pwd: "boss", roles: [{ role: "userAdminAnyDatabase", db: "admin" }]})'
+            mongo admin -uboss -pboss --authenticationDatabase admin --eval 'db.createUser({ user: "admin", pwd: "adminPass", roles: [{ role: "dbOwner", db: "poet" }]})'
       - run:
           name: Build dist
           command: npm run build
