@@ -36,7 +36,7 @@ services:
   bitcoind-1:
     image: ruimarinho/bitcoin-core:0.17.0
     ports:
-      - "18443:18443"
+      - "18443:18444"
     #volumes:
     #  - type: tmpfs
     #    target: /home/bitcoin/.bitcoin
@@ -54,7 +54,7 @@ services:
   bitcoind-2:
     image: ruimarinho/bitcoin-core:0.17.0
     ports:
-      - "19443:18443"
+      - "19443:18444"
     #volumes:
     #  - type: tmpfs
     #    target: /home/bitcoin/.bitcoin
