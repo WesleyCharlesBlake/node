@@ -22,16 +22,18 @@ jobs:
           root: .
           paths:
             - ./image.tar
+            - ./docker-compose.yml
 
   lint:
     executor: docker-publisher
+    working_directory: /tmp/workspace
     steps:
       - attach_workspace:
           at: /tmp/workspace
       - setup_remote_docker
       - run:
           name: Load archived Docker image
-          command: docker load -i /tmp/workspace/image.tar
+          command: docker load -i image.tar
       - run:
           name: Run lint in container
           command: |
@@ -39,13 +41,14 @@ jobs:
 
   coverage:
     executor: docker-publisher
+    working_directory: /tmp/workspace
     steps:
       - attach_workspace:
           at: /tmp/workspace
       - setup_remote_docker
       - run:
           name: Load archived Docker image
-          command: docker load -i /tmp/workspace/image.tar
+          command: docker load -i image.tar
       - run:
           name: Run lint in container
           command: |
