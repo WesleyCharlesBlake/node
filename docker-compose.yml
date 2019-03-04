@@ -54,9 +54,9 @@ services:
     image: ruimarinho/bitcoin-core:0.17.0
     ports:
       - "19443:18443"
-    volumes:
-      - type: tmpfs
-        target: /home/bitcoin/.bitcoin
+    #volumes:
+    #  - type: tmpfs
+    #    target: /home/bitcoin/.bitcoin
     restart: always
     command:
       -printtoconsole
@@ -122,9 +122,9 @@ services:
     command: ["-c", "/wait-for-it.sh rabbit:5672 && npm run start:blockchain-writer"]
     entrypoint: ["/bin/sh"]
 
-volumes:
-  db:
-    driver: local
-
-  data:
-    driver: local
+#volumes:
+#  db:
+#    driver: local
+#
+#  data:
+#    driver: local
