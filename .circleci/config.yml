@@ -80,7 +80,8 @@ jobs:
           command: dockerize -wait tcp://localhost:5672 -timeout 1m
       - run:
           name: start node
-          command: nohup npm start 2>/dev/null 1>/dev/null&
+          command: npm run start
+          background: true
       - run:
           name: Wait for node
           command: dockerize -wait http://localhost:18080/health -timeout 1m
