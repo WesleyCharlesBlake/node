@@ -65,6 +65,7 @@ jobs:
 
   coverage:
     executor: coverage-builder
+    - checkout
     steps:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
