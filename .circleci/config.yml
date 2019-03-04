@@ -4,14 +4,14 @@ executors:
     environment:
       IMAGE_NAME: poetapp/node
     docker:
-      - image: poetapp/base:10.14.2
+      - image: poetapp/base:10.14.2-alpine 
       
   coverage-builder:
     environment:
       IMAGE_NAME: poetapp/node
       DOCKERIZE_VERSION: v0.3.0
     docker:
-      - image: poetapp/base:10.14.2
+      - image: poetapp/base:10.14.2-alpine
     # The secondary container is an instance of the second listed image which is run in a common network where ports exposed on the primary container are available on localhost.
       - image: mongo:3.7
         environment:
