@@ -61,13 +61,11 @@ jobs:
       - run:
           name: get container logs
           command: |
-            #!/bin/sh
+            
             declare -a arr=("poet-node" "poet-node-blockchain-writer" "bitcoind-1" "bitcoind-2" "mongo" "ipfs" "rabbit")
             mkdir /tmp/logs
-            for i in "${arr[@]}"
-            do
-               docker-compose logs $i > /tmp/logs/$i.log
-            done
+            for i in "${arr[@]}"; do docker-compose logs $i > /tmp/logs/$i.log; done
+          when: on_fail
       - store_test_results:
           path: .coverage/
       - store_artifacts:
