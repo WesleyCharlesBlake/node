@@ -79,6 +79,8 @@ jobs:
       BITCOIN_URL: localhost
       BITCOIN_URL_B: localhost
       BITCOIN_PORT: "18443"
+      BITCOIN_USERNAME: bitcoinrpcuser
+      BITCOIN_PASSWORD: bitcoinrpcpassword
       LOGGING_LEVEL: trace
     executor: coverage-builder
     steps:
@@ -110,17 +112,15 @@ jobs:
           name: Mine blocks
           command: |
             apk add curl
-            curl --user rpcuser:rpcpassword -k http://127.0.0.1:18443 --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "generate", "params": ["101"] }' -H 'content-type: text/plain;'
+            curl --user bitcoinrpcuser:bitcoinrpcpassword -k http://127.0.0.1:18443 --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "generate", "params": ["101"] }' -H 'content-type: text/plain;'
       - run:
           name: Check health
           command: |
-            sleep 5
+            sleep 15
             curl http://localhost:18080/health
-            sleep 5
+            sleep 15
             curl http://localhost:18080/health
-            sleep 5
-            curl http://localhost:18080/health
-            sleep 5
+            sleep 15
             curl http://localhost:18080/health
       - run:
           name: Run coverage in container
