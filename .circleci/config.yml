@@ -105,11 +105,13 @@ jobs:
           command: dockerize -wait http://localhost:18080/health -timeout 1m
       - run:
           name: Mine blocks
-          command: node scripts/regtest-watcher.js
+          command: npm run start:blockchain-writer
           background: true
       - run:
           name: Check health
-          command: curl http://localhost:18080/health
+          command: | 
+            apk add curl
+            curl http://localhost:18080/health
       - run:
           name: Run coverage in container
           command: npm run coverage
