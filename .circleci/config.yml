@@ -28,16 +28,15 @@ executors:
       - name: ipfs
         image: ipfs/go-ipfs:v0.4.18
 
-      - image: ruimarinho/bitcoin-core:0.17.0
+      - name: bitcoind
+        image: ruimarinho/bitcoin-core:0.17.0
         command: [
           "-printtoconsole",
           "-server",
           "-regtest=1",
-          "-port=18444",
           "-rpcuser=bitcoinrpcuser",
           "-rpcpassword=bitcoinrpcpassword",
-          "-rpcport=18443",
-          "-rpcallowip=::/0",
+          "-rpcallowip=0.0.0.0/0",
           "-deprecatedrpc=signrawtransaction"
         ]
 
@@ -76,8 +75,8 @@ jobs:
       IPFS_URL: http://ipfs:5001
       IPFS_ARCHIVE_URL_PREFIX: http://ipfs:8080/ipfs
       INTEGRATION_TEST_NODE_URL: http:/localhost:18080
-      BITCOIN_URL: localhost
-      BITCOIN_URL_B: localhost
+      BITCOIN_URL: bitcoind
+      BITCOIN_URL_B: bitcoind
       BITCOIN_PORT: "18443"
       BITCOIN_USERNAME: bitcoinrpcuser
       BITCOIN_PASSWORD: bitcoinrpcpassword
@@ -89,7 +88,9 @@ jobs:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: check ports on host
-          command: netstat -ltnp
+          command: |
+            netstat -ltnp
+            export PS1="\u@${POET_SERVICE:-noService}:\w# "
       - run:
           name: Build dist
           command: npm run build
@@ -112,7 +113,7 @@ jobs:
           name: Mine blocks
           command: |
             apk add curl
-            curl --user bitcoinrpcuser:bitcoinrpcpassword -k http://127.0.0.1:18443 --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "generate", "params": ["101"] }' -H 'content-type: text/plain;'
+            curl --user bitcoinrpcuser:bitcoinrpcpassword -k http://127.0.0.1:18443 --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "generate", "params": [101] }' -H 'content-type: text/plain;'
       - run:
           name: Check health
           command: |
