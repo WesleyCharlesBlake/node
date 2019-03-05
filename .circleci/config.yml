@@ -28,7 +28,7 @@ executors:
       - name: ipfs
         image: ipfs/go-ipfs:v0.4.18
 
-      - name: bitcoind-1
+      - name: bitcoind
         image: ruimarinho/bitcoin-core:0.17.0
         command: [
           "-printtoconsole",
@@ -38,7 +38,7 @@ executors:
           "-rpcpassword=bitcoinrpcpassword",
           "-rpcallowip=::/0",
           "-deprecatedrpc=signrawtransaction",
-          "-port=18443"
+          "-port=18444"
         ]
 
 jobs:
@@ -76,8 +76,9 @@ jobs:
       IPFS_URL: http://ipfs:5001
       IPFS_ARCHIVE_URL_PREFIX: http://ipfs:8080/ipfs
       INTEGRATION_TEST_NODE_URL: http:/localhost:18080
-      BITCOIN_URL: bitcoind-1
-      BITCOIN_URL_B: bitcoind-1
+      BITCOIN_URL: bitcoind
+      BITCOIN_URL_B: bitcoind
+      BITCOIN_PORT: "18444"
       LOGGING_LEVEL: trace
     executor: coverage-builder
     steps:
@@ -105,6 +106,7 @@ jobs:
       - run:
           name: Mine blocks
           command: node scripts/regtest-watcher.js
+          background: true
       - run:
           name: Check health
           command: curl http://localhost:18080/health
