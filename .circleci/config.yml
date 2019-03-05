@@ -1,94 +1,120 @@
 version: 2.1
 executors:
-  docker-publisher:
+  base-node:
     environment:
       IMAGE_NAME: poetapp/node
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: poetapp/base:10.14.2-alpine 
+      
+  coverage-builder:
+    environment:
+      IMAGE_NAME: poetapp/node
+      DOCKERIZE_VERSION: v0.3.0
+
+    docker:
+      - image: poetapp/base:10.14.2-alpine
+
+      # this containers make up the node dep services, which run in the primary container      
+      - name: mongo
+        image: poetapp/mongo-ci:4.0.6
+
+      - name: rabbit
+        image: rabbitmq:3
+        environment:
+          RABBITMQ_ERLANG_COOKIE: some_secret_cookie
+          RABBITMQ_DEFAULT_USER: admin
+          RABBITMQ_DEFAULT_PASS: adminPass
+        
+      - name: ipfs
+        image: ipfs/go-ipfs:v0.4.18
+
+      - name: bitcoind-1
+        image: ruimarinho/bitcoin-core:0.17.0
+        command: [
+          "-printtoconsole",
+          "-server",
+          "-regtest=1",
+          "-rpcuser=bitcoinrpcuser",
+          "-rpcpassword=bitcoinrpcpassword",
+          "-rpcallowip=::/0",
+          "-deprecatedrpc=signrawtransaction",
+          "-port=18443"
+        ]
+
 jobs:
   build:
-    executor: docker-publisher
+    executor: base-node
     steps:
       - checkout
-      - setup_remote_docker
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
-          name: Build Docker image
-          command: |
-            docker build -t $IMAGE_NAME:latest .
-      - run:
-          name: Archive Docker image
-          command: docker save -o image.tar $IMAGE_NAME
-      - persist_to_workspace:
-          root: .
+          name: Install deps
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
-            - ./image.tar
-            - ./docker-compose.yml
+            - ./node_modules
 
   lint:
-    executor: docker-publisher
-    working_directory: /tmp/workspace
+    executor: base-node
     steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - setup_remote_docker
-      - run:
-          name: Load archived Docker image
-          command: docker load -i image.tar
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: Run lint in container
-          command: |
-            docker run -ti $IMAGE_NAME:latest npm run lint
+          command: npm run lint
+
   coverage:
-    executor: docker-publisher
-    working_directory: /tmp/workspace
+    environment:
+      MONGODB_USER: "poet"
+      MONGODB_PASSWORD: "poetPass"
+      MONGODB_DATABASE: "poet"
+      MONGODB_HOST: mongo
+      RABBITMQ_URL: amqp://admin:adminPass@rabbit
+      IPFS_URL: http://ipfs:5001
+      IPFS_ARCHIVE_URL_PREFIX: http://ipfs:8080/ipfs
+      INTEGRATION_TEST_NODE_URL: http:/localhost:18080
+      BITCOIN_URL: bitcoind-1
+      BITCOIN_URL_B: bitcoind-1
+      LOGGING_LEVEL: trace
+    executor: coverage-builder
     steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - setup_remote_docker
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
-          name: Load archived Docker image
-          command: docker load -i image.tar
+          name: Build dist
+          command: npm run build
       - run:
-          name: Run swap build context with image
-          command: |
-            sed -i 's#build: .#image: poetapp/node:latest#g' docker-compose.yml
+          name: Install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz            
       - run:
-          name: Start docker-compose services
-          command: docker-compose up -d
+          name: Wait for rabbitmq
+          command: dockerize -wait tcp://rabbit:5672 -timeout 1m
+      - run:
+          name: start node
+          command: npm run start
+          background: true
+          environment:
+            POET_SERVICE: node
+      - run:
+          name: Wait for node
+          command: dockerize -wait http://localhost:18080/health -timeout 1m
       - run:
           name: Mine blocks
-          command: docker-compose exec poet-node node scripts/regtest-watcher.js
-          background: true
+          command: node scripts/regtest-watcher.js
       - run:
-          name: Run coverage report
-          command: docker-compose exec poet-node npm run coverage
+          name: Check health
+          command: curl http://localhost:18080/health
       - run:
-          name: get container logs
-          command: |
-            declare -a arr=("poet-node" "poet-node-blockchain-writer" "bitcoind-1" "bitcoind-2" "mongo" "ipfs" "rabbit")
-            mkdir -p /tmp/logs/{docker,npm/{node,"blockchain-writer"}}
-            for i in "${arr[@]}"; do docker-compose logs $i > /tmp/logs/docker/$i.log; done
-            docker cp workspace_poet-node_1:/root/.npm/_logs/ /tmp/logs/npm/node/
-            docker cp workspace_poet-node-blockchain-writer_1:/root/.npm/_logs/ /tmp/logs/npm/blockchain-writer/
-          when: on_fail
+          name: Run coverage in container
+          command: npm run coverage
       - store_test_results:
-          path: .coverage/
+          path: ~/.coverage/
       - store_artifacts:
-          path: /tmp/logs/
-  # publish:
-  #   executor: docker-publisher
-  #   steps:
-  #     - attach_workspace:
-  #         at: /tmp/workspace
-  #     - setup_remote_docker
-  #     - run:
-  #         name: Load archived Docker image
-  #         command: docker load -i /tmp/workspace/image.tar
-  #     - run:
-  #         name: Publish Docker Image to Docker Hub
-  #         command: |
-  #           echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-  #           docker push $IMAGE_NAME:latest
+          path: /root/.npm/
 
 workflows:
   version: 2
@@ -107,11 +133,3 @@ workflows:
           filters:
             branches:
               only: master
-      # - publish:
-      #     context: org-global
-      #     requires:
-      #       - lint
-      #       - coverage
-      #     filters:
-      #       branches:
-      #         only: master
